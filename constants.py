@@ -1,0 +1,19 @@
+# constants.py
+import pygame
+
+WIDTH, HEIGHT = 1100, 700
+FPS = 60
+STEP_DISTANCE = 4
+FRICTION = 0.98
+MAX_DISTANCE = 700
+MAX_KICK_POWER = 16
+
+WHITE = (255, 255, 255)
+BLUE = (0, 100, 255)
+GREEN = (0, 200, 0)
+RED = (255, 50, 50)
+BLACK = (0, 0, 0)
+FIELD_GREEN = (34, 139, 34)
+CONE_COLOR = (0, 255, 0, 80)
+
+FIELD_RECT = pygame.Rect(0, 0, 2000, 1500)
