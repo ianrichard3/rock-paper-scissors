@@ -7,6 +7,7 @@ from ball import Ball
 from field import draw_field
 from ui import draw_button
 
+
 pygame.init()
 
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -14,10 +15,21 @@ pygame.display.set_caption("Trayectoria por arrastre")
 clock = pygame.time.Clock()
 font = pygame.font.SysFont(None, 30)
 
-players = [Player(300 + (i % 4) * 80, 300 + (i // 4) * 100) for i in range(11)]
+
 ball = Ball(FIELD_RECT.centerx, FIELD_RECT.centery)
 
 button_rect = pygame.Rect(WIDTH - 170, HEIGHT - 80, 150, 60)
+
+
+players = []
+
+# Team A
+for i in range(11):
+    players.append(Player(300 + i * 80, 300, color=BLUE, team=0))
+
+# Team B
+for i in range(11):
+    players.append(Player(300 + i * 80, 600, color=RED, team=1))
 
 
 while True:
@@ -47,16 +59,27 @@ while True:
             if event.button == 2:
                 game_state.moving_camera = False
             elif button_rect.collidepoint(event.pos) and not game_state.turn_active:
-                any_movement = False
-                for player in players:
-                    if player.saved_path:
-                        player.moving = True
-                        player.current_step = 0
-                        any_movement = True
-                if any_movement:
-                    game_state.turn_active = True
-                    game_state.ball_paused = False
-                    ball.velocity = ball.stored_velocity if hasattr(ball, 'stored_velocity') else pygame.Vector2(0, 0)
+                if game_state.waiting_to_execute:
+                    # ✅ Fase de ejecución final confirmada
+                    any_movement = False
+                    for player in players:
+                        if player.saved_path:
+                            player.moving = True
+                            player.current_step = 0
+                            any_movement = True
+                    if any_movement:
+                        game_state.turn_active = True
+                        game_state.ball_paused = False
+                        ball.velocity = ball.stored_velocity if hasattr(ball, 'stored_velocity') else pygame.Vector2(0, 0)
+                    game_state.waiting_to_execute = False
+                    game_state.planning_team = 0  # vuelve a equipo A
+                else:
+                    if game_state.planning_team == 0:
+                        game_state.planning_team = 1  # pasa a equipo B
+                    else:
+                        game_state.waiting_to_execute = True  # ✅ ahora espera ejecución
+
+
 
         if event.type == pygame.MOUSEMOTION:
             if game_state.moving_camera and game_state.last_mouse_pos:

@@ -16,4 +16,4 @@ BLACK = (0, 0, 0)
 FIELD_GREEN = (34, 139, 34)
 CONE_COLOR = (0, 255, 0, 80)
 
-FIELD_RECT = pygame.Rect(0, 0, 2000, 1500)
+FIELD_RECT = pygame.Rect(0, 0, 2400, 1500)

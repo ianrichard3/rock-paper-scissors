@@ -4,8 +4,9 @@ from constants import RED, BLUE, MAX_DISTANCE, STEP_DISTANCE, MAX_KICK_POWER, CO
 import game_state
 
 class Player:
-    def __init__(self, x, y, color=BLUE):
+    def __init__(self, x, y, color=BLUE, team=0):
         self.position = pygame.Vector2(x, y)
+        self.team = team
         self.radius = 20
         self.color = color
         self.kick_power = 0
@@ -22,7 +23,7 @@ class Player:
         self.current_distance = 0
 
     def handle_event(self, event, mouse_pos):
-        if game_state.turn_active:
+        if game_state.turn_active or self.team != game_state.planning_team:
             return
 
         world_mouse = (pygame.Vector2(mouse_pos) - game_state.offset) / game_state.zoom
@@ -96,14 +97,17 @@ class Player:
 
     def draw(self, surface):
         transformed_pos = self.position * game_state.zoom + game_state.offset
-        if len(self.raw_path) >= 2:
-            transformed_path = [(p * game_state.zoom + game_state.offset) for p in self.raw_path]
-            pygame.draw.lines(surface, RED, False, transformed_path, 3)
+        if not game_state.turn_active and self.team == game_state.planning_team:
+            if len(self.raw_path) >= 2:
+                transformed_path = [(p * game_state.zoom + game_state.offset) for p in self.raw_path]
+                pygame.draw.lines(surface, RED, False, transformed_path, 3)
+
         pygame.draw.circle(surface, self.color, (int(transformed_pos.x), int(transformed_pos.y)), int(self.radius * game_state.zoom))
 
-        if self.kick_direction.length() > 0:
-            end_pos = self.position + self.kick_direction * self.kick_power * 3
-            pygame.draw.line(surface, BLACK, self.position * game_state.zoom + game_state.offset, end_pos * game_state.zoom + game_state.offset, 2)
+        if not game_state.turn_active and self.team == game_state.planning_team:
+            if self.kick_direction.length() > 0:
+                end_pos = self.position + self.kick_direction * self.kick_power * 3
+                pygame.draw.line(surface, BLACK, self.position * game_state.zoom + game_state.offset, end_pos * game_state.zoom + game_state.offset, 2)
 
         self.draw_cone(surface, transformed_pos, self.facing_direction)
 
